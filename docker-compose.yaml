@@ -1,0 +1,19 @@
+version: "3"
+services:
+  web:
+    build:
+      context: . # the context is the current directory
+      dockerfile: Dockerfile.dev # the Dockerfile to use
+    ports:
+      - "3000:3000"
+    volumes:
+      - /app/node_modules # this is to prevent the node_modules folder from being overwritten by the host
+      - .:/app # this is to map the current directory to the /app directory in the container. any changes made in the current directory will be reflected in the container
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - /app/node_modules
+      - .:/app
+    command: ["npm", "run", "test"] # this is to run the tests
