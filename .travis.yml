@@ -14,5 +14,24 @@ before_install:
 # We need to add -- --coverage to the command to make sure that the test suite exits after running the tests
 # Or we can pass CI=true to the command to make sure that the test suite exits after running the tests
 # The -e flag is used to set an environment variable
+# Status code 0 means that the tests passed
 script:
   - docker run -e CI=true nilesh2000/docker-react npm run test
+
+# Deploy to AWS
+# Travis CI comes pre-configured has a built-in deployment script for Elastic Beanstalk
+deploy:
+  provider: elasticbeanstalk
+  region: "ap-southeast-2"
+  app: "frontend" # app desribes a common set of configurations for the environment
+  env: "Frontend-env" # env describes the environment that the app is running in
+  bucket_name: "elasticbeanstalk-ap-southeast-2-381492066461" # bucket_name is the S3 bucket that Travis CI is going to put our code into
+  # when the s3 bucket is created, it is not going to create a folder with the name of the app. so we are bucket_path same as app
+  bucket_path: "frontend" # we need to specify bucket_path because the s3 bucket gets reused for multiple Elastic Beanstalk environments
+  on:
+    branch: main # only deploy when we push to the main branch
+  # We need to set up IAM user in AWS to give Travis CI permission to deploy to Elastic Beanstalk
+  # Do not hardcode the access key and secret access key in the .travis.yml file
+  # Instead, we need to set up environment secrets in Travis CI
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: "$AWS_SECRET_KEY"
