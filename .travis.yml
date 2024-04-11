@@ -1,0 +1,18 @@
+# Anytime we used Docker, we need superuser permissions
+# Requesting travis to give us superuser permissions to execute this build
+sudo: required
+services:
+  - docker # tell travis we need a copy of docker running
+
+# Series of commands that are executed before our tests are run
+before_install:
+  - docker build -t nilesh2000/docker-react -f Dockerfile.dev .
+
+# Series of commands that are executed to run our test suite
+# Travis CI is going to watch the output of this command. If it ever gets a status code other than 0, it's going to assume that our build failed.
+# Travis CI assumes that our test suite is going to run and then exit. If it doesn't exit, it's going to assume that our test suite failed.
+# We need to add -- --coverage to the command to make sure that the test suite exits after running the tests
+# Or we can pass CI=true to the command to make sure that the test suite exits after running the tests
+# The -e flag is used to set an environment variable
+script:
+  - docker run -e CI=true nilesh2000/docker-react npm run test
